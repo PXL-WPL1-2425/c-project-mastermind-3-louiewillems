@@ -1,0 +1,244 @@
+﻿<Window x:Class="Mastermind.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Mastermind"
+        mc:Ignorable="d"
+        Title="Mastermind" Height="500" Width="800"
+        x:Name="mainWindow" 
+        KeyDown="mainWindow_KeyDown" Closing="mainWindow_Closing"
+        >
+
+    <Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.4,0">
+            <GradientStop Color="#FF0D0725"/>
+            <GradientStop Color="#FF040308" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid>
+        <Menu HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="3" >
+            <MenuItem Header="Bestand">
+                <MenuItem Name="newItem" Header="Nieuw Spel" Click="menuItemClicked" ></MenuItem>
+                <MenuItem Name="highScoreItem" Header="HighScore" Click="menuItemClicked" ></MenuItem>
+                <MenuItem Name="exitItem" Header="Afsluiten" Click="menuItemClicked" ></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Instellingen">
+                <MenuItem Name="attemptsItem" Header="Aantal pogingen" Click="menuItemClicked" ></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid>
+
+            <!--<StackPanel Background="#F2060921" VerticalAlignment="Top" Panel.ZIndex="2">-->
+            <StackPanel Background="DarkSlateGray" VerticalAlignment="Top" Panel.ZIndex="2">
+                <!--<StackPanel HorizontalAlignment="Center">
+                    <Label>Player</Label>
+                </StackPanel>-->
+                <Label Height="0" />
+                <StackPanel Margin="0,0,0,0">
+                    <StackPanel x:Name="nameInsertStack" Height="0" Orientation="Horizontal" HorizontalAlignment="Center" Visibility="Visible" Margin="0,0" >
+                        <Label x:Name="nextPlayerLabel" Content="Geef een player naam:" Foreground="White"/>
+                        <TextBox x:Name="nameInsertTextbox" Width="150" KeyDown="nameInsertTextbox_KeyDown" ></TextBox>
+                        <Button x:Name="selectNameButton" Content=">" Width="20" Height="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectNameButton_Click" />
+                        <Button x:Name="selectionReadyButton" Content="V" Width="20" Height="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectReadyButton_Click" />
+                    </StackPanel>
+                    <StackPanel Height="0" x:Name="attempsInsertStack" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5" Visibility="Collapsed" >
+                        <Label Content="Pogingen" Foreground="White"/>
+                        <TextBox Width="50"></TextBox>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <Grid x:Name="mainGrid" Margin="0,30,0,0" Opacity="0.1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0">
+                    <TextBlock Text="SCORE" Width="100"  TextAlignment="Center" Foreground="White"/>
+                    <TextBox x:Name="scoreLabel"  Width="100" TextAlignment="Center" IsReadOnly="False" BorderThickness="0" 
+                        Background="Transparent" Foreground="White" FontSize="30" FontWeight="Bold" TextChanged="OnScoreLabelsTextChanged"/>
+                    <TextBox x:Name="playerLabel"  Width="100" TextAlignment="Center" IsReadOnly="False" BorderThickness="0" 
+                        Background="Transparent" Foreground="OrangeRed" FontSize="20" FontWeight="Bold" TextChanged="OnScoreLabelsTextChanged"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0">
+                    <TextBox x:Name="pogingLabel" Text="POGING" Width="100"  TextAlignment="Center" IsReadOnly="False" BorderThickness="0"
+                        Background="Transparent" Foreground="White" TextChanged="OnScoreLabelsTextChanged"/>
+                    <TextBox x:Name="timeLabel"  Width="100" Height="auto" TextAlignment="Center" IsReadOnly="False" BorderThickness="0" 
+                        Background="Transparent"  Foreground="White" FontSize="18" FontWeight="UltraBold"  TextChanged="OnScoreLabelsTextChanged"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="0" Margin="0,0,0,20">
+
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,0,0,10">
+                        <Label x:Name="redLabel" Tag="red" Padding="30,15" Opacity="0.4" Background="Red" MouseLeftButtonUp="Label_MouseLeftButtonUp" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave"/>
+                        <Label x:Name="orangeLabel" Tag="orange" Padding="30,15" Opacity="0.4" Background="Orange"  MouseLeftButtonUp="Label_MouseLeftButtonUp" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave"/>
+                        <Label x:Name="yellowLabel" Tag="yellow" Padding="30,15" Opacity="0.4" Background="Yellow" MouseLeftButtonUp="Label_MouseLeftButtonUp" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave"/>
+                        <Label x:Name="whiteLabel" Tag="white" Padding="30,15" Opacity="0.4" Background="White" MouseLeftButtonUp="Label_MouseLeftButtonUp" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave"/>
+                        <Label x:Name="greenLabel" Tag="green" Padding="30,15" Opacity="0.4" Background="Green" MouseLeftButtonUp="Label_MouseLeftButtonUp" MouseEnter="Label_MouseLeave" MouseLeave="Label_MouseLeave"/>
+                        <Label x:Name="blueLabel" Tag="blue" Padding="30,15" Opacity="0.4" Background="Blue" MouseLeftButtonUp="Label_MouseLeftButtonUp" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave"/>
+                    </StackPanel>
+
+                    <Grid>
+
+                        <Grid MaxWidth="500">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <Ellipse Grid.Row="0" x:Name="choiceEllipse0" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent" 
+                             MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
+                                        <GradientStop Color="WhiteSmoke" Offset="0"/>
+                                        <GradientStop Color="Blue" Offset="0.5"/>
+                                        <GradientStop Color="DarkBlue" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="0"  Y="-1" />
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
+                                </Ellipse.Effect>
+                            </Ellipse>
+                            <Label Grid.Column="0" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray" Opacity="0.3" >
+                                <Label.RenderTransform>
+                                    <TransformGroup>
+                                        <SkewTransform AngleX="-8" AngleY="0" />
+                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
+                                        <TranslateTransform X="0" Y="2" />
+                                    </TransformGroup>
+                                </Label.RenderTransform>
+                                <Label.Effect>
+                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
+                                </Label.Effect>
+                            </Label>
+                            <Ellipse Grid.Column="1" Grid.Row="0"  x:Name="choiceEllipse1" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent"  
+                              MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
+                                        <GradientStop Color="LightYellow" Offset="0"/>
+                                        <GradientStop Color="Yellow" Offset="0.5"/>
+                                        <GradientStop Color="Orange" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="0"  Y="-1" />
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
+                                </Ellipse.Effect>
+                            </Ellipse>
+                            <Label Grid.Column="1" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray" Opacity="0.3" >
+                                <Label.RenderTransform>
+                                    <TransformGroup>
+                                        <SkewTransform AngleX="-8" AngleY="0" />
+                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
+                                        <TranslateTransform X="0" Y="2" />
+                                    </TransformGroup>
+                                </Label.RenderTransform>
+                                <Label.Effect>
+                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
+                                </Label.Effect>
+                            </Label>
+                            <Ellipse  Grid.Column="2" Grid.Row="0" x:Name="choiceEllipse2" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent"  
+                             MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
+                                        <GradientStop Color="WhiteSmoke" Offset="0"/>
+                                        <GradientStop Color="Blue" Offset="0.5"/>
+                                        <GradientStop Color="DarkBlue" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="0"  Y="-1" />
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
+                                </Ellipse.Effect>
+                            </Ellipse>
+                            <Label Grid.Column="2" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray"  Opacity="0.3"  >
+                                <Label.RenderTransform>
+                                    <TransformGroup>
+                                        <SkewTransform AngleX="-8" AngleY="0" />
+                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
+                                        <TranslateTransform X="0" Y="2" />
+                                    </TransformGroup>
+                                </Label.RenderTransform>
+                                <Label.Effect>
+                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
+                                </Label.Effect>
+                            </Label>
+                            <Ellipse  Grid.Column="3" Grid.Row="0"  x:Name="choiceEllipse3" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent"  
+                             MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
+                                <Ellipse.Fill>
+                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
+                                        <GradientStop Color="WhiteSmoke" Offset="0"/>
+                                        <GradientStop Color="Blue" Offset="0.5"/>
+                                        <GradientStop Color="DarkBlue" Offset="1"/>
+                                    </RadialGradientBrush>
+                                </Ellipse.Fill>
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="0"  Y="-1" />
+                                </Ellipse.RenderTransform>
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
+                                </Ellipse.Effect>
+                            </Ellipse>
+                            <Label Grid.Column="3" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray" Opacity="0.3"  >
+                                <Label.RenderTransform>
+                                    <TransformGroup>
+                                        <SkewTransform AngleX="-8" AngleY="0" />
+                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
+                                        <TranslateTransform X="0" Y="2" />
+                                    </TransformGroup>
+                                </Label.RenderTransform>
+                                <Label.Effect>
+                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
+                                </Label.Effect>
+                            </Label>
+
+                        </Grid>
+
+                    </Grid>
+
+                    <Button x:Name="validateButton" Background="Transparent" Margin="0,-30,0,0"
+                        Width="150"  FontSize="18" FontWeight="Bold" FontFamily="Verdana" 
+                        Height="36"  Click="validateButton_Click" MouseEnter="validateButton_MouseEnter" MouseLeave="validateButton_MouseLeave"  >
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Border CornerRadius="16">
+                                    <Grid>
+                                        <Label Foreground="White" HorizontalAlignment="Center" Content="Check code"/>
+                                    </Grid>
+                                    <Border.Background>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FF19A8FC" Offset="0"/>
+                                            <GradientStop Color="#FF2C1C61" Offset="0.863"/>
+                                            <GradientStop Color="#FF070270" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="1" x:Name="scrollViewer"  VerticalScrollBarVisibility="Hidden" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"  >
+                    <StackPanel  x:Name="historyStackPanel" MinWidth="300" MaxWidth="600"></StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+        <TextBox x:Name="debugTextBox" Text="Tesct" HorizontalAlignment="Center" IsReadOnly="True" TextWrapping="Wrap" TextAlignment="Center" Visibility="Collapsed" Panel.ZIndex="1"
+            VerticalAlignment="Bottom" Padding="20,7" FontWeight="Bold" Foreground="White" Background="Transparent" FontSize="13" />
+    </Grid>
+</Window>
