@@ -448,6 +448,9 @@ namespace Mastermind
                 icon = MessageBoxImage.Information;
             }
 
+            if (_players.ElementAtOrDefault(_currentPlayer.Id + 1) is Player nextPlayer)
+                message += $"\r\nNu is player {nextPlayer.Name} aan de beurt";
+
             //if (_gamePoints > 0)
             //{
             CalculateHighScores(_currentPlayer.Name, _attempts, _gamePoints);
