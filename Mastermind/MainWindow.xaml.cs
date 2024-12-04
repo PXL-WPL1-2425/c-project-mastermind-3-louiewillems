@@ -338,16 +338,19 @@ namespace Mastermind
                 circle.HorizontalAlignment = HorizontalAlignment.Center;
                 circle.VerticalAlignment = VerticalAlignment.Center;
                 circle.SetValue(Grid.ColumnProperty, i);
+                circle.ToolTip = $"geen kleur: \"Foute kleur\"";
 
                 if (historyEntry[hIndex].isCorrectPosition)
                 {
                     circle.StrokeThickness = 2;
                     circle.Stroke = Brushes.Red;
+                    circle.ToolTip = $"rode rand: \"Juiste kleur, juiste positie\"";
                 }
                 else if (historyEntry[hIndex].isCorrectColor)
                 {
                     circle.StrokeThickness = 2;
                     circle.Stroke = Brushes.Wheat;
+                    circle.ToolTip = $"witte rand: \"Juiste kleur, foute positie\"";
                 }
 
                 // animation
