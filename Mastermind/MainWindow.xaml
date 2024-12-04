@@ -40,8 +40,8 @@
                     <StackPanel x:Name="nameInsertStack" Height="0" Orientation="Horizontal" HorizontalAlignment="Center" Visibility="Visible" Margin="0,0" >
                         <Label x:Name="nextPlayerLabel" Content="Geef een player naam:" Foreground="White"/>
                         <TextBox x:Name="nameInsertTextbox" Width="150" KeyDown="nameInsertTextbox_KeyDown" ></TextBox>
-                        <Button x:Name="selectNameButton" Content=">" Width="20" Height="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectNameButton_Click" />
-                        <Button x:Name="selectionReadyButton" Content="V" Width="20" Height="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectReadyButton_Click" />
+                        <Button x:Name="selectNameButton" Content=">" Width="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectNameButton_Click" />
+                        <Button x:Name="selectionReadyButton" Content="x" Width="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectReadyButton_Click" />
                     </StackPanel>
                     <StackPanel Height="0" x:Name="attempsInsertStack" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5" Visibility="Collapsed" >
                         <Label Content="Pogingen" Foreground="White"/>
