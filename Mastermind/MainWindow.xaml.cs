@@ -38,6 +38,8 @@ namespace Mastermind
             { "blue", new List<SolidColorBrush> { Brushes.FloralWhite, Brushes.Blue, Brushes.DarkBlue } },
         };
 
+        private List<HistoryEntry>? _lastHistoryEntries;
+
         private Ellipse? _selectedEllipse;
 
         private string[] _highScores = new string[15];
@@ -109,6 +111,7 @@ namespace Mastermind
         {
             // clear last game
             _timer?.Stop();
+            _isRunning = false;
             mainGrid.Opacity = 0.2;
             _isCorrectGuess = false;
             _attempts = 0;
@@ -125,6 +128,7 @@ namespace Mastermind
             // force start new game
             if (startGame)
             {
+                _lastHistoryEntries = null;
                 _currentPlayer = null;
                 _playersStringList.Clear();
                 _players.Clear();
@@ -155,6 +159,7 @@ namespace Mastermind
 
                     //todo: score laten zien ofzo
 
+                    _players.Clear();
                 }
 
             }
@@ -254,29 +259,33 @@ namespace Mastermind
             int boxIndex = 0;
             int correctCount = 0;
 
-            (List<SolidColorBrush> mainColor, bool isCorrectColor, bool isCorrectPosition)[] historyEntry
-                = new (List<SolidColorBrush> mainColor, bool isCorrectColor, bool isCorrectPosition)[4];
+            List<HistoryEntry> historyEntry = new List<HistoryEntry>();
 
             _choiceEllipses.ForEach(box =>
             {
                 if (box.Tag is string value)
                 {
                     int penaltyPoints = 2;
-                    (List<SolidColorBrush> mainColor, bool isCorrectColor, bool isCorrectPosition) item
-                            = new(_colorOptions[value], false, false);
+
+                    HistoryEntry item = new HistoryEntry
+                    {
+                        MainColor = _colorOptions[value]
+                    };
+
+
                     if (correctColors.Contains(value))
                     {
-                        item.isCorrectColor = true;
+                        item.IsCorrectColor = true;
                         penaltyPoints = 1;
 
                         if (value.Equals(correctColors[boxIndex]))
                         {
-                            item.isCorrectPosition = true;
+                            item.IsCorrectPosition = true;
                             penaltyPoints = 0;
                             correctCount++;
                         }
                     }
-                    historyEntry[boxIndex] = item;
+                    historyEntry.Add(item);
                     _gamePoints -= penaltyPoints;
                     if (_gamePoints <= 0)
                     {
@@ -287,7 +296,7 @@ namespace Mastermind
                 boxIndex++;
             });
 
-
+            _lastHistoryEntries = historyEntry;
             AddToHistory(historyEntry);
 
             if (correctCount == _choiceEllipses.Count)
@@ -296,7 +305,7 @@ namespace Mastermind
             }
 
         }
-        private void AddToHistory((List<SolidColorBrush> mainColor, bool isCorrectColor, bool isCorrectPosition)[] historyEntry)
+        private void AddToHistory(List<HistoryEntry> historyEntries)
         {
             Grid grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(35, GridUnitType.Pixel) });
@@ -334,19 +343,19 @@ namespace Mastermind
                 Ellipse circle = new Ellipse();
                 circle.Width = 35;
                 circle.Height = 35;
-                circle.Fill = GetGradientBrush(historyEntry[hIndex].mainColor, new Point(0.3, 0.3));
+                circle.Fill = GetGradientBrush(historyEntries[hIndex].MainColor, new Point(0.3, 0.3));
                 circle.HorizontalAlignment = HorizontalAlignment.Center;
                 circle.VerticalAlignment = VerticalAlignment.Center;
                 circle.SetValue(Grid.ColumnProperty, i);
                 circle.ToolTip = $"geen kleur: \"Foute kleur\"";
 
-                if (historyEntry[hIndex].isCorrectPosition)
+                if (historyEntries[hIndex].IsCorrectPosition)
                 {
                     circle.StrokeThickness = 2;
                     circle.Stroke = Brushes.Red;
                     circle.ToolTip = $"rode rand: \"Juiste kleur, juiste positie\"";
                 }
-                else if (historyEntry[hIndex].isCorrectColor)
+                else if (historyEntries[hIndex].IsCorrectColor)
                 {
                     circle.StrokeThickness = 2;
                     circle.Stroke = Brushes.Wheat;
@@ -454,10 +463,8 @@ namespace Mastermind
             if (_players.ElementAtOrDefault(_currentPlayer.Id + 1) is Player nextPlayer)
                 message += $"\r\nNu is player {nextPlayer.Name} aan de beurt";
 
-            //if (_gamePoints > 0)
-            //{
+            
             CalculateHighScores(_currentPlayer.Name, _attempts, _gamePoints);
-            //}
 
             MessageBox.Show(message, title, MessageBoxButton.OK, icon);
 
@@ -472,13 +479,16 @@ namespace Mastermind
             if (_currentPlayer != null)
                 _players[_currentPlayer.Id].HighScore = highScore;
 
-            //if (_highScoresList.Any(x => x.Name.Equals(currentPlayer)
-            //    && ((x.Score > score) || (x.Score == score && x.Pogingen < pogingen))))
-            //    return;
+            // 
+            if (
+                //todo: score == 0
+                _highScoresList.Any(x => x.Name.Equals(currentPlayer)
+                && ((x.Score > score) || (x.Score == score && x.Pogingen < pogingen))))
+                
+                return;
+            _highScoresList.RemoveAll(x => x.Name.Equals(currentPlayer));
 
-            //_highScoresList.RemoveAll(x => x.Name.Equals(currentPlayer));
-
-
+            //
             _highScoresList.Add(highScore);
             _highScoresList = _highScoresList.OrderByDescending(x => x.Score).Take(15).ToList();
 
@@ -490,6 +500,28 @@ namespace Mastermind
             }
 
             _highScores = newScores.ToArray();
+        }
+
+        private void GiveHint()
+        {
+            if (!_isRunning || _selectedColors == null || !_selectedColors.Any())
+                return;
+
+            this.IsEnabled = false;
+            _timer?.Stop();
+
+            HintMessageBox msg = new HintMessageBox(_lastHistoryEntries!, _selectedColors);
+            msg.Owner = this;
+
+            if (msg.ShowDialog() == true)
+            {
+                _gamePoints -= msg.Result;
+                if (_gamePoints <= 0)
+                    _gamePoints = 0;
+                scoreLabel.Text = $"{_gamePoints}";
+            }
+            this.IsEnabled = true;
+            _timer?.Start();
         }
 
         #endregion
@@ -801,13 +833,15 @@ namespace Mastermind
                         RenewGame(startGame: true);
                         break;
                     case "highScoreItem":
-
-                        StringBuilder sb = new StringBuilder();
-                        foreach (string score in _highScores)
+                        if (_highScores.Where(x => x != null).ToList() is List<string> list && list.Any())
                         {
-                            sb.AppendLine(score);
+                            StringBuilder sb = new StringBuilder();
+                            foreach (string score in list)
+                            {
+                                sb.AppendLine(score);
+                            }
+                            MessageBox.Show(sb.ToString(), "Mastermind highscores", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
-                        MessageBox.Show(sb.ToString(), "Mastermind highscores", MessageBoxButton.OK, MessageBoxImage.Information);
                         break;
                     case "exitItem":
                         ExitApp();
@@ -822,7 +856,11 @@ namespace Mastermind
                             attempts = Interaction.InputBox("Geef het aantal attempts in tussen min 3 en max 20:", "Pogingen", "", 500);
                         }
                         _maxAttempts = newAttempt;
+
                         RenewGame(startGame: _isRunning);
+                        break;
+                    case "hintItem":
+                        GiveHint();
                         break;
                 }
 
@@ -884,8 +922,11 @@ namespace Mastermind
         {
             if (MessageBox.Show("Wilt u het spel vroegtijdig beeindigen?", $"poging {_attempts}/10", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
                 e.Cancel = true;
+            else
+            {
+                Environment.Exit(0);
+            }
         }
-
 
         #endregion
 
@@ -898,6 +939,12 @@ namespace Mastermind
         }
     }
 
+    public class HistoryEntry
+    {
+        public List<SolidColorBrush>? MainColor { get; set; }
+        public bool IsCorrectColor { get; set; }
+        public bool IsCorrectPosition { get; set; }
+    }
 
     class HighScore
     {

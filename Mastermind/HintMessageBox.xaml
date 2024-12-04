@@ -1,0 +1,21 @@
+﻿<Window x:Class="Mastermind.HintMessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Mastermind"
+        mc:Ignorable="d"
+        Title="Hint?" Height="150" Width="220" WindowStartupLocation="CenterScreen" Topmost="True" WindowStyle="ToolWindow" Background="#FF0D0725">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Label x:Name="hintLabel" Grid.Row="0" Content="TIP? *Let op, dit kost strafpunten!" HorizontalContentAlignment="Center" Foreground="White" FontSize="12" />
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center">
+            <Button x:Name="correctColorButton" Content="Kleur (15p)" FontSize="11" Margin="0,1" Click="ButtonClicked" />
+            <Button x:Name="correctPositionButton" Content="Kleur en positie (25p)" FontSize="11" Margin="0,1" Click="ButtonClicked"/>
+            <Button x:Name="cancelButton" Content="Cancel" FontSize="11" Margin="0,10,0,0" Click="ButtonClicked"/>
+        </StackPanel>
+    </Grid>
+</Window>

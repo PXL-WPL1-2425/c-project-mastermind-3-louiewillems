@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Mastermind" Height="500" Width="800"
         x:Name="mainWindow" 
-        KeyDown="mainWindow_KeyDown" Closing="mainWindow_Closing"
+        KeyDown="mainWindow_KeyDown" Closing="mainWindow_Closing" WindowStartupLocation="CenterScreen"
         >
 
     <Window.Background>
@@ -22,6 +22,7 @@
             <MenuItem Header="Bestand">
                 <MenuItem Name="newItem" Header="Nieuw Spel" Click="menuItemClicked" ></MenuItem>
                 <MenuItem Name="highScoreItem" Header="HighScore" Click="menuItemClicked" ></MenuItem>
+                <MenuItem Name="hintItem" Header="Hint" Click="menuItemClicked" ></MenuItem>
                 <MenuItem Name="exitItem" Header="Afsluiten" Click="menuItemClicked" ></MenuItem>
             </MenuItem>
             <MenuItem Header="Instellingen">
