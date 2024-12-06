@@ -8,6 +8,8 @@ using System.Windows.Shapes;
 using System.Text;
 using Microsoft.VisualBasic;
 using System.Xml.Linq;
+using System.Windows.Media.Effects;
+using System.Security.Cryptography;
 
 namespace Mastermind
 {
@@ -19,6 +21,7 @@ namespace Mastermind
         private int _gamePoints = 100;
         private int _attempts = 0;
         private int _maxAttempts = 10;
+        private int _maxColors = 4;
         private DispatcherTimer? _timer;
         private int _timerCount = 0;
         private const int _timerMaxCount = 10;
@@ -39,7 +42,6 @@ namespace Mastermind
         };
 
         private List<HistoryEntry>? _lastHistoryEntries;
-
         private Ellipse? _selectedEllipse;
 
         private string[] _highScores = new string[15];
@@ -51,7 +53,6 @@ namespace Mastermind
 
         private TaskCompletionSource<string>? _getPlayerNameTask;
         private bool _playersReady = false;
-        //private int playerIndex = 
         private TaskCompletionSource<int>? _getMaxAttempsTask;
 
         #endregion
@@ -100,6 +101,7 @@ namespace Mastermind
             backRadial.GradientStops[0].BeginAnimation(GradientStop.OffsetProperty, stopPosition0Animation);
 
             RenewGame(startGame: false);
+            SetupNewLayout();
 
         }
 
@@ -119,11 +121,6 @@ namespace Mastermind
             pogingLabel.Text = $"POGING: {_attempts}/{_maxAttempts}";
             scoreLabel.Text = $"{_gamePoints}";
             historyStackPanel.Children.Clear();
-            _choiceEllipses.Clear();
-            _labels.Clear();
-            _choiceEllipses.AddRange(new List<Ellipse>() { choiceEllipse0, choiceEllipse1, choiceEllipse2, choiceEllipse3 });
-            _labels.AddRange(new List<Label>() { redLabel, orangeLabel, yellowLabel, whiteLabel, greenLabel, blueLabel });
-            ResetAllBalls();
 
             // force start new game
             if (startGame)
@@ -140,7 +137,11 @@ namespace Mastermind
                     _players.Add(new Player { Id = i, Name = _playersStringList[i] });
                 }
 
+                SetupNewLayout();
             }
+
+
+            ResetAllBalls();
 
             // select next player
             if (_players.Any())
@@ -231,7 +232,7 @@ namespace Mastermind
             List<(string, List<SolidColorBrush>)> selectedOptions = new List<(string, List<SolidColorBrush>)>();
 
             var rand = new Random();
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < _maxColors; i++)
             {
                 if (_colorOptions.ElementAt(rand.Next(0, _colorOptions.Count()))
                     is KeyValuePair<string, List<SolidColorBrush>> keyPair)
@@ -309,10 +310,10 @@ namespace Mastermind
         {
             Grid grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(35, GridUnitType.Pixel) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            for (int i = 0; i < _maxColors; i++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            }
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(40) });
 
             Label label = new Label();
@@ -337,7 +338,7 @@ namespace Mastermind
             label.SetValue(Grid.ColumnProperty, 0);
             grid.Children.Add(label);
 
-            for (int i = 1; i < 5; i++)
+            for (int i = 1; i < _maxColors + 1; i++)
             {
                 int hIndex = i - 1;
                 Ellipse circle = new Ellipse();
@@ -393,12 +394,15 @@ namespace Mastermind
             {
                 _labels[i].Opacity = 0.4;
             }
-            for (int i = 0; i < _choiceEllipses.Count(); i++)
+            if (_choiceEllipses.Any())
             {
-                _choiceEllipses[i].StrokeThickness = 1;
-                _choiceEllipses[i].Stroke = Brushes.LightGray;
-                _choiceEllipses[i].Fill = Brushes.Transparent;
-                _choiceEllipses[i].Tag = null;
+                for (int i = 0; i < _choiceEllipses.Count(); i++)
+                {
+                    _choiceEllipses[i].StrokeThickness = 1;
+                    _choiceEllipses[i].Stroke = Brushes.LightGray;
+                    _choiceEllipses[i].Fill = Brushes.Transparent;
+                    _choiceEllipses[i].Tag = null;
+                }
             }
         }
         private void SelectBall(Ellipse ellipse)
@@ -463,7 +467,7 @@ namespace Mastermind
             if (_players.ElementAtOrDefault(_currentPlayer.Id + 1) is Player nextPlayer)
                 message += $"\r\nNu is player {nextPlayer.Name} aan de beurt";
 
-            
+
             CalculateHighScores(_currentPlayer.Name, _attempts, _gamePoints);
 
             MessageBox.Show(message, title, MessageBoxButton.OK, icon);
@@ -484,7 +488,7 @@ namespace Mastermind
                 //todo: score == 0
                 _highScoresList.Any(x => x.Name.Equals(currentPlayer)
                 && ((x.Score > score) || (x.Score == score && x.Pogingen < pogingen))))
-                
+
                 return;
             _highScoresList.RemoveAll(x => x.Name.Equals(currentPlayer));
 
@@ -612,6 +616,81 @@ namespace Mastermind
             scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, animation);
             scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, animation);
         }
+
+        private void SetupNewLayout()
+        {
+            ballOptionsGrid.Children.Clear();
+
+            _choiceEllipses.Clear();
+            _labels.Clear();
+            _labels.AddRange(new List<Label>() { redLabel, orangeLabel, yellowLabel, whiteLabel, greenLabel, blueLabel });
+
+            Grid grid = new Grid();
+            grid.MaxWidth = 700;
+
+            for (int i = 0; i < _maxColors; i++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            }
+
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
+
+            for (int i = 0; i < _maxColors; i++)
+            {
+                Ellipse ellipse = new Ellipse();
+                ellipse.SetValue(Grid.ColumnProperty, i);
+                ellipse.SetValue(Grid.RowProperty, 0);
+                ellipse.Name = $"choice{i}Ellipse";
+                ellipse.Stroke = Brushes.Transparent;
+                ellipse.StrokeThickness = 4;
+                ellipse.Width = 60;
+                ellipse.Height = 60;
+                ellipse.MouseWheel += Ellipse_MouseWheel;
+                ellipse.MouseEnter += Ellipse_MouseEnter;
+                ellipse.RenderTransform = new TranslateTransform { X = 0, Y = -1 };
+                ellipse.Effect = new DropShadowEffect
+                {
+                    Color = Brushes.White.Color,
+                    ShadowDepth = 50,
+                    Direction = -90,
+                    BlurRadius = 40,
+                    Opacity = 0.04,
+                    RenderingBias = RenderingBias.Quality
+                };
+
+
+                Label platformLabel = new Label();
+                platformLabel.SetValue(Grid.ColumnProperty, i);
+                platformLabel.SetValue(Grid.RowProperty, 1);
+                platformLabel.Width = 60;
+                platformLabel.Height = 60;
+                platformLabel.Background = Brushes.DarkSlateGray;
+                platformLabel.Opacity = 0.3;
+
+                TransformGroup group = new TransformGroup();
+                group.Children.Add(new SkewTransform { AngleX = -8, AngleY = 0 });
+                group.Children.Add(new ScaleTransform { ScaleX = 1.2, ScaleY = 0.1 });
+                group.Children.Add(new TranslateTransform { X = 0, Y = 2 });
+                platformLabel.RenderTransform = group;
+                platformLabel.Effect = new DropShadowEffect
+                {
+                    Color = Brushes.LightGray.Color,
+                    ShadowDepth = 150,
+                    Direction = 308,
+                    BlurRadius = 100,
+                    Opacity = 0.04,
+                    RenderingBias = RenderingBias.Quality
+                };
+
+                _choiceEllipses.Add(ellipse);
+                grid.Children.Add(ellipse);
+                grid.Children.Add(platformLabel);
+
+            }
+            ballOptionsGrid.Children.Add(grid);
+
+        }
         #endregion
 
         #region Events
@@ -629,7 +708,7 @@ namespace Mastermind
                 return;
 
             _attempts++;
-            if (_selectedColors.Any() && _selectedColors.Count == 4)
+            if (_selectedColors.Any() && _selectedColors.Count == _maxColors)
             {
                 ControlColors(_selectedColors.Select(x => x.name).ToArray());
                 pogingLabel.Text = $"POGING: {_attempts}/{_maxAttempts}";
@@ -857,6 +936,20 @@ namespace Mastermind
                         }
                         _maxAttempts = newAttempt;
 
+                        RenewGame(startGame: _isRunning);
+                        break;
+                    case "maxColorItem":
+
+                        string colors = Interaction.InputBox("Geef het aantal kleuren in tussen min 4 en max 6:", "Kleur", "", 500);
+                        int newColors = _maxColors;
+                        while (string.IsNullOrEmpty(colors) || !int.TryParse(colors, out newColors) || newColors < 4 || newColors > 6)
+                        {
+                            MessageBox.Show("Geef een geldige aantal:", "Foutieve invoer");
+                            colors = Interaction.InputBox("Geef het aantal kleuren in tussen min 4 en max 6:", "Kleur", "", 500);
+                        }
+                        _maxColors = newColors;
+
+                        SetupNewLayout();
                         RenewGame(startGame: _isRunning);
                         break;
                     case "hintItem":

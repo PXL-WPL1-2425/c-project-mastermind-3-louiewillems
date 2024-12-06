@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mastermind"
         mc:Ignorable="d"
-        Title="Mastermind" Height="500" Width="800"
+        Title="Mastermind" Height="600" Width="1000"
         x:Name="mainWindow" 
         KeyDown="mainWindow_KeyDown" Closing="mainWindow_Closing" WindowStartupLocation="CenterScreen"
         >
@@ -27,17 +27,18 @@
             </MenuItem>
             <MenuItem Header="Instellingen">
                 <MenuItem Name="attemptsItem" Header="Aantal pogingen" Click="menuItemClicked" ></MenuItem>
+                <MenuItem Name="maxColorItem" Header="Aantal kleuren" Click="menuItemClicked" ></MenuItem>
             </MenuItem>
         </Menu>
         <Grid>
 
             <!--<StackPanel Background="#F2060921" VerticalAlignment="Top" Panel.ZIndex="2">-->
             <StackPanel Background="DarkSlateGray" VerticalAlignment="Top" Panel.ZIndex="2">
-                <!--<StackPanel HorizontalAlignment="Center">
-                    <Label>Player</Label>
-                </StackPanel>-->
-                <Label Height="0" />
-                <StackPanel Margin="0,0,0,0">
+                <StackPanel HorizontalAlignment="Center">
+                </StackPanel>
+                    <!--<Label>Player</Label>-->
+                <!--<Label Height="0" />-->
+                <StackPanel Margin="0,0,0,0" Width="700">
                     <StackPanel x:Name="nameInsertStack" Height="0" Orientation="Horizontal" HorizontalAlignment="Center" Visibility="Visible" Margin="0,0" >
                         <Label x:Name="nextPlayerLabel" Content="Geef een player naam:" Foreground="White"/>
                         <TextBox x:Name="nameInsertTextbox" Width="150" KeyDown="nameInsertTextbox_KeyDown" ></TextBox>
@@ -81,135 +82,7 @@
                         <Label x:Name="blueLabel" Tag="blue" Padding="30,15" Opacity="0.4" Background="Blue" MouseLeftButtonUp="Label_MouseLeftButtonUp" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave"/>
                     </StackPanel>
 
-                    <Grid>
-
-                        <Grid MaxWidth="500">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                            </Grid.RowDefinitions>
-                            <Ellipse Grid.Row="0" x:Name="choiceEllipse0" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent" 
-                             MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
-                                        <GradientStop Color="WhiteSmoke" Offset="0"/>
-                                        <GradientStop Color="Blue" Offset="0.5"/>
-                                        <GradientStop Color="DarkBlue" Offset="1"/>
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                                <Ellipse.RenderTransform>
-                                    <TranslateTransform X="0"  Y="-1" />
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Effect>
-                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
-                                </Ellipse.Effect>
-                            </Ellipse>
-                            <Label Grid.Column="0" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray" Opacity="0.3" >
-                                <Label.RenderTransform>
-                                    <TransformGroup>
-                                        <SkewTransform AngleX="-8" AngleY="0" />
-                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
-                                        <TranslateTransform X="0" Y="2" />
-                                    </TransformGroup>
-                                </Label.RenderTransform>
-                                <Label.Effect>
-                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
-                                </Label.Effect>
-                            </Label>
-                            <Ellipse Grid.Column="1" Grid.Row="0"  x:Name="choiceEllipse1" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent"  
-                              MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
-                                        <GradientStop Color="LightYellow" Offset="0"/>
-                                        <GradientStop Color="Yellow" Offset="0.5"/>
-                                        <GradientStop Color="Orange" Offset="1"/>
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                                <Ellipse.RenderTransform>
-                                    <TranslateTransform X="0"  Y="-1" />
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Effect>
-                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
-                                </Ellipse.Effect>
-                            </Ellipse>
-                            <Label Grid.Column="1" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray" Opacity="0.3" >
-                                <Label.RenderTransform>
-                                    <TransformGroup>
-                                        <SkewTransform AngleX="-8" AngleY="0" />
-                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
-                                        <TranslateTransform X="0" Y="2" />
-                                    </TransformGroup>
-                                </Label.RenderTransform>
-                                <Label.Effect>
-                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
-                                </Label.Effect>
-                            </Label>
-                            <Ellipse  Grid.Column="2" Grid.Row="0" x:Name="choiceEllipse2" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent"  
-                             MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
-                                        <GradientStop Color="WhiteSmoke" Offset="0"/>
-                                        <GradientStop Color="Blue" Offset="0.5"/>
-                                        <GradientStop Color="DarkBlue" Offset="1"/>
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                                <Ellipse.RenderTransform>
-                                    <TranslateTransform X="0"  Y="-1" />
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Effect>
-                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
-                                </Ellipse.Effect>
-                            </Ellipse>
-                            <Label Grid.Column="2" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray"  Opacity="0.3"  >
-                                <Label.RenderTransform>
-                                    <TransformGroup>
-                                        <SkewTransform AngleX="-8" AngleY="0" />
-                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
-                                        <TranslateTransform X="0" Y="2" />
-                                    </TransformGroup>
-                                </Label.RenderTransform>
-                                <Label.Effect>
-                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
-                                </Label.Effect>
-                            </Label>
-                            <Ellipse  Grid.Column="3" Grid.Row="0"  x:Name="choiceEllipse3" Width="60" Height="60" StrokeThickness="4" Stroke="Transparent"  
-                             MouseWheel="Ellipse_MouseWheel" MouseEnter="Ellipse_MouseEnter">
-                                <Ellipse.Fill>
-                                    <RadialGradientBrush GradientOrigin="0.3,0.3">
-                                        <GradientStop Color="WhiteSmoke" Offset="0"/>
-                                        <GradientStop Color="Blue" Offset="0.5"/>
-                                        <GradientStop Color="DarkBlue" Offset="1"/>
-                                    </RadialGradientBrush>
-                                </Ellipse.Fill>
-                                <Ellipse.RenderTransform>
-                                    <TranslateTransform X="0"  Y="-1" />
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Effect>
-                                    <DropShadowEffect Color="White" ShadowDepth="50" Direction="-90" BlurRadius="40"  Opacity="0.04" RenderingBias="Quality"  />
-                                </Ellipse.Effect>
-                            </Ellipse>
-                            <Label Grid.Column="3" Grid.Row="1" Width="60" Height="60" Background="DarkSlateGray" Opacity="0.3"  >
-                                <Label.RenderTransform>
-                                    <TransformGroup>
-                                        <SkewTransform AngleX="-8" AngleY="0" />
-                                        <ScaleTransform ScaleX="1.2" ScaleY="0.1" />
-                                        <TranslateTransform X="0" Y="2" />
-                                    </TransformGroup>
-                                </Label.RenderTransform>
-                                <Label.Effect>
-                                    <DropShadowEffect Color="LightGray" ShadowDepth="150" BlurRadius="100" Direction="308" Opacity="0.4"  />
-                                </Label.Effect>
-                            </Label>
-
-                        </Grid>
-
-                    </Grid>
+                    <Grid x:Name="ballOptionsGrid" />
 
                     <Button x:Name="validateButton" Background="Transparent" Margin="0,-30,0,0"
                         Width="150"  FontSize="18" FontWeight="Bold" FontFamily="Verdana" 
