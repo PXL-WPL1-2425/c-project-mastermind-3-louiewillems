@@ -33,17 +33,54 @@
         <Grid>
 
             <!--<StackPanel Background="#F2060921" VerticalAlignment="Top" Panel.ZIndex="2">-->
-            <StackPanel Background="DarkSlateGray" VerticalAlignment="Top" Panel.ZIndex="2">
-                <StackPanel HorizontalAlignment="Center">
+            <StackPanel  VerticalAlignment="Top" Panel.ZIndex="1">
+                <StackPanel.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Black"/>
+                        <GradientStop Color="#000B2161" Offset="1"/>
+                    </LinearGradientBrush>
+                </StackPanel.Background>
+                <StackPanel x:Name="playerStackPanel" Height="0" HorizontalAlignment="Center" Orientation="Horizontal">
+                    
+                    <StackPanel x:Name="prevPlayersStackPanel"  Margin="0,6" MinWidth="210"  >
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="prevPlayerButton" Content="&#129186;"  Click="prevPlayerButton_Click" IsEnabled="True"
+                                    Foreground="White" Background="Transparent" BorderThickness="0" FontSize="18" Margin="0,-5,0,0"  Width="30" Height="30" />
+                            <Button x:Name="nextPlayerButton" Content="&#129187;" Click="nextPlayerButton_Click" IsEnabled="True"
+                                    Foreground="White" Background="Transparent" BorderThickness="0" FontSize="18" Margin="0,-5,0,0" Width="30" Height="30" />
+                            <Label Content="PREV:"  HorizontalContentAlignment="Center" Margin="-5,0,0,5" Foreground="MediumOrchid" />
+                            <Label x:Name="prevPlayerNameLabel" Content="naamdfsf" Margin="-3,0,0,5"  FontWeight="SemiBold" HorizontalContentAlignment="Center" Foreground="White"  Panel.ZIndex="3"/>
+                        </StackPanel>
+                        <StackPanel Margin="5"  >
+                            <Label x:Name="prevPlayerAttemptsLabel"  Content="CODE : gekraakt in 4 pogingen" FontWeight="Bold" Foreground="LawnGreen" HorizontalContentAlignment="Left" />
+                            <Label x:Name="prevPlayerScoreLabel" Content="SCORE: 8/10" Foreground="LightBlue" FontWeight="Bold" HorizontalContentAlignment="Left" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel x:Name="currentPlayersStackPanel" MinWidth="180" Margin="10,0" >
+                        <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
+                            <Label Content="Playing:" Foreground="DodgerBlue"  HorizontalContentAlignment="Center"/>
+                            <Label x:Name="currPlayerNameLabel" Content="player" Foreground="White" FontWeight="ExtraBold" FontSize="13"  HorizontalContentAlignment="Center" Margin="0"/>
+                        </StackPanel>
+                        <StackPanel Margin="5">
+                            <Label x:Name="currPlayerAttemptsLabel"  Content="ATTEMPT: 4/10"  HorizontalContentAlignment="Center"  FontWeight="Bold" Foreground="LightBlue" />
+                            <Label x:Name="currPlayerHintLabel" Content="Hint"  HorizontalContentAlignment="Center"  FontWeight="Bold" Foreground="WhiteSmoke" />
+                            <Label x:Name="currPlayerScoreLabel" Content="SCORE: 8/10"  HorizontalContentAlignment="Center"  FontWeight="Bold" Foreground="WhiteSmoke" />
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" x:Name="nextPlayersStackPanel" VerticalAlignment="Top" Margin="10,5"  >
+                        <Label Content="NEXT:" HorizontalAlignment="Right" Foreground="Orange" HorizontalContentAlignment="Center"/>
+                        <Label x:Name="nextPlayerNameLabel" Content="next player"  Foreground="White" />
+                    </StackPanel>
+                    <Button x:Name="collapseButton" Content="&#128899;" Click="collapseButton_Click"
+                            Foreground="White" Background="Transparent" FontSize="18"  Width="30" Height="30" Margin="15,-5,0,0" VerticalAlignment="Center"/>
                 </StackPanel>
-                    <!--<Label>Player</Label>-->
-                <!--<Label Height="0" />-->
-                <StackPanel Margin="0,0,0,0" Width="700">
-                    <StackPanel x:Name="nameInsertStack" Height="0" Orientation="Horizontal" HorizontalAlignment="Center" Visibility="Visible" Margin="0,0" >
-                        <Label x:Name="nextPlayerLabel" Content="Geef een player naam:" Foreground="White"/>
-                        <TextBox x:Name="nameInsertTextbox" Width="150" KeyDown="nameInsertTextbox_KeyDown" ></TextBox>
-                        <Button x:Name="selectNameButton" Content=">" Width="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectNameButton_Click" />
-                        <Button x:Name="selectionReadyButton" Content="x" Width="20" BorderThickness="0" Background="Transparent" Foreground="White" Click="selectReadyButton_Click" />
+                <!--<Label>Player</Label>-->
+                <StackPanel x:Name="settingStackPanel"  Width="700">
+                    <StackPanel x:Name="nameInsertStack" Height="0" Orientation="Horizontal" HorizontalAlignment="Center" Visibility="Visible"  >
+                        <Label x:Name="nextPlayerLabel" Content="Geef een player naam:" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Height="30"/>
+                        <TextBox x:Name="nameInsertTextbox" Width="150" Height="30" KeyDown="nameInsertTextbox_KeyDown"  VerticalAlignment="Center" VerticalContentAlignment="Center" ></TextBox>
+                        <Button x:Name="selectNameButton" Content="&#127383;" Width="30" Height="30" FontSize="18" BorderThickness="0" Background="Transparent" Foreground="LightBlue"  VerticalAlignment="Center" Click="selectNameButton_Click" />
+                        <Button x:Name="selectionReadyButton" Content="&#10060;" Width="30" Height="30" BorderThickness="0" Background="Transparent" Foreground="OrangeRed"  VerticalAlignment="Center" Click="selectReadyButton_Click" />
                     </StackPanel>
                     <StackPanel Height="0" x:Name="attempsInsertStack" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5" Visibility="Collapsed" >
                         <Label Content="Pogingen" Foreground="White"/>
@@ -57,14 +94,14 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                     <TextBlock Text="SCORE" Width="100"  TextAlignment="Center" Foreground="White"/>
                     <TextBox x:Name="scoreLabel"  Width="100" TextAlignment="Center" IsReadOnly="False" BorderThickness="0" 
                         Background="Transparent" Foreground="White" FontSize="30" FontWeight="Bold" TextChanged="OnScoreLabelsTextChanged"/>
                     <TextBox x:Name="playerLabel"  Width="100" TextAlignment="Center" IsReadOnly="False" BorderThickness="0" 
                         Background="Transparent" Foreground="OrangeRed" FontSize="20" FontWeight="Bold" TextChanged="OnScoreLabelsTextChanged"/>
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0">
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top">
                     <TextBox x:Name="pogingLabel" Text="POGING" Width="100"  TextAlignment="Center" IsReadOnly="False" BorderThickness="0"
                         Background="Transparent" Foreground="White" TextChanged="OnScoreLabelsTextChanged"/>
                     <TextBox x:Name="timeLabel"  Width="100" Height="auto" TextAlignment="Center" IsReadOnly="False" BorderThickness="0" 

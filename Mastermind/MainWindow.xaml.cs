@@ -10,25 +10,26 @@ using Microsoft.VisualBasic;
 using System.Xml.Linq;
 using System.Windows.Media.Effects;
 using System.Security.Cryptography;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Mastermind
 {
     public partial class MainWindow : Window
     {
         #region properties
-        private bool _isCorrectGuess = false;
-        private bool _isDebugMode = false;
+        private bool _isCorrectGuess { get; set; }
+        private bool _isDebugMode { get; set; }
         private int _gamePoints = 100;
         private int _attempts = 0;
-        private int _maxAttempts = 10;
-        private int _maxColors = 4;
+        private int _maxAttempts { get; set; } = 10;
+        private int _maxColors { get; set; } = 4;
         private DispatcherTimer? _timer;
         private int _timerCount = 0;
         private const int _timerMaxCount = 10;
-        private bool _enableResetOnEachTurn = false;
-        private bool _isRunning = false;
+        private bool _enableResetOnEachTurn { get; set; }
+        private bool _isRunning { get; set; }
 
-        private List<(string name, List<SolidColorBrush> color)> _selectedColors = new List<(string name, List<SolidColorBrush> color)>();
+        private List<(string name, List<SolidColorBrush> color)> _selectedColors { get; set; } = new List<(string name, List<SolidColorBrush> color)>();
         private readonly List<Label> _labels = new List<Label>();
         private readonly List<Ellipse> _choiceEllipses = new List<Ellipse>();
         private readonly Dictionary<string, List<SolidColorBrush>> _colorOptions = new Dictionary<string, List<SolidColorBrush>>()
@@ -41,19 +42,22 @@ namespace Mastermind
             { "blue", new List<SolidColorBrush> { Brushes.FloralWhite, Brushes.Blue, Brushes.DarkBlue } },
         };
 
-        private List<HistoryEntry>? _lastHistoryEntries;
-        private Ellipse? _selectedEllipse;
+        private List<HistoryEntry>? _lastHistoryEntries { get; set; }
+        private Ellipse? _selectedEllipse { get; set; }
 
-        private string[] _highScores = new string[15];
-        private List<HighScore> _highScoresList = new List<HighScore>();
+        private string[] _highScores { get; set; } = new string[15];
+        private List<HighScore> _highScoresList { get; set; } = new List<HighScore>();
 
-        private Player? _currentPlayer;
-        private List<string> _playersStringList = new List<string>();
-        private List<Player> _players = new List<Player>();
+        private Player? _currentPlayer { get; set; }
+        private List<string> _playersStringList { get; set; } = new List<string>();
+        private List<Player> _players { get; set; } = new List<Player>();
 
         private TaskCompletionSource<string>? _getPlayerNameTask;
-        private bool _playersReady = false;
+        private bool _playersReady { get; set; }
         private TaskCompletionSource<int>? _getMaxAttempsTask;
+
+        private bool _playerPanelIsToggled { get; set; }
+        private int _prevPlayerIndexSelected = -1;
 
         #endregion
 
@@ -63,7 +67,6 @@ namespace Mastermind
 
             Init();
         }
-
 
         private void Init()
         {
@@ -160,6 +163,8 @@ namespace Mastermind
 
                     //todo: score laten zien ofzo
 
+
+                    ClearPlayerPanel();
                     _players.Clear();
                 }
 
@@ -173,14 +178,118 @@ namespace Mastermind
                 StartCountdown();
                 _isRunning = true;
                 mainGrid.Opacity = 1;
+                _prevPlayerIndexSelected = -1;
+
+                UpdatePlayerPanel();
+
             }
 
+        }
+
+        private void UpdatePlayerPanel()
+        {
+            if (!_isRunning || _currentPlayer == null)
+                return;
+
+            //show hide/collapse
+            if (_playerPanelIsToggled)
+            {
+                playerStackPanel.Height = 120;
+                mainGrid.Margin = new Thickness(0, 150, 0, 0);
+            }
+            else
+            {
+                playerStackPanel.Height = 40;
+                mainGrid.Margin = new Thickness(0, 70, 0, 0);
+            }
+
+            //currentplayer
+            currPlayerNameLabel.Content = _currentPlayer.Name;
+            currPlayerScoreLabel.Content = $"SCORE: {_gamePoints}";
+            currPlayerAttemptsLabel.Content = $"POGING: {_attempts}/{_maxAttempts}";
+            if (_currentPlayer.HintCount > 0)
+            {
+                currPlayerHintLabel.Visibility = Visibility.Visible;
+                currPlayerHintLabel.Content = $"{_currentPlayer.StrafpuntenCount} hint(s) = {_currentPlayer.StrafpuntenCount} strafpunten";
+            }
+            else
+                currPlayerHintLabel.Visibility = Visibility.Collapsed;
+
+            //nextplayer
+            if (_players.ElementAtOrDefault(_currentPlayer.Id + 1) is Player nextPlayer)
+            {
+                nextPlayerNameLabel.Content = nextPlayer.Name;
+                nextPlayersStackPanel.Visibility = Visibility.Visible;
+            }
+            else
+                nextPlayersStackPanel.Visibility = Visibility.Hidden;
+
+
+            //previous player of current selectie
+            int prevIndex = (_prevPlayerIndexSelected != -1) ? _prevPlayerIndexSelected : _currentPlayer.Id - 1;
+            if (_players.ElementAtOrDefault(prevIndex) is Player prevPlayer)
+            {
+
+                List<Player> finishedLst = _players
+                .Where(x => x.FinishedGame)
+                .OrderBy(x => x.Id)
+                .ToList();
+
+                if (finishedLst.Count > 1)
+                {
+                    int foundIndexInPrevious = finishedLst.FindIndex(x => x.Id == prevPlayer.Id);
+                    if (finishedLst.ElementAtOrDefault(foundIndexInPrevious - 1) is Player _)
+                        prevPlayerButton.Visibility = Visibility.Visible;
+                    else
+                        prevPlayerButton.Visibility = Visibility.Hidden;
+
+                    if (finishedLst.ElementAtOrDefault(foundIndexInPrevious + 1) is Player _)
+                        nextPlayerButton.Visibility = Visibility.Visible;
+                    else
+                        nextPlayerButton.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    prevPlayerButton.Visibility = Visibility.Hidden;
+                    nextPlayerButton.Visibility = Visibility.Hidden;
+                }
+
+
+                _prevPlayerIndexSelected = prevIndex;
+
+                prevPlayerNameLabel.Content = prevPlayer.Name;
+
+                if (prevPlayer.HighScore.IsVictory)
+                {
+                    prevPlayerAttemptsLabel.Content = $"CODE : gekraakt in {prevPlayer.HighScore?.Pogingen} pogingen";
+                    prevPlayerNameLabel.Foreground = Brushes.LawnGreen;
+                    prevPlayerAttemptsLabel.Foreground = Brushes.LawnGreen;
+                }
+                else
+                {
+                    prevPlayerAttemptsLabel.Content = $"CODE : Failed!!  {prevPlayer.HighScore?.Pogingen} pogingen";
+                    prevPlayerNameLabel.Foreground = Brushes.Red;
+                    prevPlayerAttemptsLabel.Foreground = Brushes.Red;
+                }
+
+                prevPlayerScoreLabel.Content = $"SCORE: {prevPlayer.HighScore?.Score}";
+                prevPlayersStackPanel.Visibility = Visibility.Visible;
+            }
+            else
+                prevPlayersStackPanel.Visibility = Visibility.Hidden;
+
+        }
+        private void ClearPlayerPanel()
+        {
+            playerStackPanel.Height = 0;
+            mainGrid.Margin = new Thickness(0, 30, 0, 0);
         }
 
         private async Task<List<string>> StartGame()
         {
             //todo: showfunction
-            nameInsertStack.Height = 25;
+            nameInsertStack.Height = 100;
+            playerStackPanel.Height = 0;
             _playersReady = false;
 
             do
@@ -445,7 +554,7 @@ namespace Mastermind
         }
 
         /// <summary>
-        /// Ends the game on win/loose. Gives an option to exit the game.
+        /// Ends the game on win/loose. Adds current score to highscores 
         /// </summary>
         /// <param name="isVictory"></param>
         private void EndGame(bool isVictory)
@@ -467,8 +576,9 @@ namespace Mastermind
             if (_players.ElementAtOrDefault(_currentPlayer.Id + 1) is Player nextPlayer)
                 message += $"\r\nNu is player {nextPlayer.Name} aan de beurt";
 
+            _currentPlayer.FinishedGame = true;
 
-            CalculateHighScores(_currentPlayer.Name, _attempts, _gamePoints);
+            CalculateHighScores(_currentPlayer.Name, _attempts, _gamePoints, isVictory);
 
             MessageBox.Show(message, title, MessageBoxButton.OK, icon);
 
@@ -476,9 +586,9 @@ namespace Mastermind
 
         }
 
-        private void CalculateHighScores(string currentPlayer, int pogingen, int score)
+        private void CalculateHighScores(string currentPlayer, int pogingen, int score, bool isVictory)
         {
-            HighScore highScore = new HighScore { Name = currentPlayer, Pogingen = pogingen, Score = score };
+            HighScore highScore = new HighScore { Name = currentPlayer, Pogingen = pogingen, Score = score, IsVictory = isVictory };
 
             if (_currentPlayer != null)
                 _players[_currentPlayer.Id].HighScore = highScore;
@@ -519,10 +629,13 @@ namespace Mastermind
 
             if (msg.ShowDialog() == true)
             {
+                _players[_currentPlayer.Id].StrafpuntenCount += msg.Result;
+                _players[_currentPlayer.Id].HintCount++;
                 _gamePoints -= msg.Result;
                 if (_gamePoints <= 0)
                     _gamePoints = 0;
                 scoreLabel.Text = $"{_gamePoints}";
+                UpdatePlayerPanel();
             }
             this.IsEnabled = true;
             _timer?.Start();
@@ -568,6 +681,7 @@ namespace Mastermind
 
                 pogingLabel.Text = $"POGING: {_attempts}/{_maxAttempts}";
                 scoreLabel.Text = $"{_gamePoints}";
+                UpdatePlayerPanel();
 
                 if (_attempts >= _maxAttempts)
                     EndGame(isVictory: false);
@@ -713,6 +827,7 @@ namespace Mastermind
                 ControlColors(_selectedColors.Select(x => x.name).ToArray());
                 pogingLabel.Text = $"POGING: {_attempts}/{_maxAttempts}";
                 scoreLabel.Text = $"{_gamePoints}";
+                UpdatePlayerPanel();
 
                 if (!_isCorrectGuess)
                 {
@@ -977,6 +1092,69 @@ namespace Mastermind
             }
         }
 
+        private void collapseButton_Click(object sender, RoutedEventArgs e)
+        {
+            _playerPanelIsToggled = !_playerPanelIsToggled;
+            collapseButton.Content = (_playerPanelIsToggled) ? "🞁" : "🞃";
+            UpdatePlayerPanel();
+        }
+        private void prevPlayerButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            List<Player> finishedLst = _players
+                .Where(x => x.FinishedGame)
+                .OrderBy(x => x.Id)
+                .ToList();
+
+            if (finishedLst.Any())
+            {
+                if (finishedLst.ElementAtOrDefault(_prevPlayerIndexSelected - 1) is Player _)
+                {
+                    _prevPlayerIndexSelected = _prevPlayerIndexSelected - 1;
+
+                    if (finishedLst.ElementAtOrDefault(_prevPlayerIndexSelected - 1) is Player _)
+                    {
+                        prevPlayerButton.Visibility = Visibility.Hidden;
+                    }
+
+                    UpdatePlayerPanel();
+
+                }
+                else
+                {
+                    prevPlayerButton.Visibility = Visibility.Hidden;
+                }
+            }
+
+        }
+
+        private void nextPlayerButton_Click(object sender, RoutedEventArgs e)
+        {
+            List<Player> finishedLst = _players
+                .Where(x => x.FinishedGame)
+                .OrderBy(x => x.Id)
+                .ToList();
+
+            if (finishedLst.Any())
+            {
+                if (finishedLst.ElementAtOrDefault(_prevPlayerIndexSelected + 1) is Player _)
+                {
+                    _prevPlayerIndexSelected = _prevPlayerIndexSelected + 1;
+
+                    if (finishedLst.ElementAtOrDefault(_prevPlayerIndexSelected + 1) is Player _)
+                    {
+                        nextPlayerButton.Visibility = Visibility.Hidden;
+                    }
+
+                    UpdatePlayerPanel();
+                }
+                else
+                {
+                    nextPlayerButton.Visibility = Visibility.Hidden;
+                }
+            }
+        }
+
         #endregion
 
         #region Exit
@@ -1030,6 +1208,8 @@ namespace Mastermind
                 selectNameButton_Click(null!, null!);
             }
         }
+
+
     }
 
     public class HistoryEntry
@@ -1044,6 +1224,7 @@ namespace Mastermind
         public int Pogingen { get; set; }
         public int Score { get; set; }
         public string Name { get; set; }
+        public bool IsVictory { get; set; }
     }
 
     class Player
@@ -1051,5 +1232,8 @@ namespace Mastermind
         public int Id { get; set; }
         public string? Name { get; set; }
         public HighScore? HighScore { get; set; }
+        public int HintCount { get; set; } = 0;
+        public int StrafpuntenCount { get; set; } = 0;
+        public bool FinishedGame { get; set; }
     }
 }

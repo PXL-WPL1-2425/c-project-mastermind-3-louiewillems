@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mastermind"
         mc:Ignorable="d"
-        Title="Hint?" Height="150" Width="220" WindowStartupLocation="CenterScreen" Topmost="True" WindowStyle="ToolWindow" Background="#FF0D0725">
+        Title="Hint?" Height="200" Width="300" WindowStartupLocation="CenterScreen" Topmost="True" WindowStyle="ToolWindow" Background="#FF0D0725">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
