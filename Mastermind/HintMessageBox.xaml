@@ -5,17 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mastermind"
         mc:Ignorable="d"
-        Title="Hint?" Height="200" Width="300" WindowStartupLocation="CenterScreen" Topmost="True" WindowStyle="ToolWindow" Background="#FF0D0725">
+        Title="Hint?" Height="200" Width="320" WindowStartupLocation="CenterScreen" Topmost="True" WindowStyle="ToolWindow" Background="#FF0D0725">
     <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <Label x:Name="hintLabel" Grid.Row="0" Content="TIP? *Let op, dit kost strafpunten!" HorizontalContentAlignment="Center" Foreground="White" FontSize="12" />
+        <Label x:Name="hintLabel" Grid.Row="0" Content="TIP? *Let op, dit kost strafpunten!" HorizontalContentAlignment="Center" Foreground="White" FontSize="15" />
         <StackPanel Grid.Row="1" HorizontalAlignment="Center">
-            <Button x:Name="correctColorButton" Content="Kleur (15p)" FontSize="11" Margin="0,1" Click="ButtonClicked" />
-            <Button x:Name="correctPositionButton" Content="Kleur en positie (25p)" FontSize="11" Margin="0,1" Click="ButtonClicked"/>
-            <Button x:Name="cancelButton" Content="Cancel" FontSize="11" Margin="0,10,0,0" Click="ButtonClicked"/>
+            <Button x:Name="correctColorButton" Content="Kleur (15p)" FontSize="13" Margin="0,1" Click="ButtonClicked" />
+            <Button x:Name="correctPositionButton" Content=" Kleur en positie (25p) " FontSize="13" Margin="0,1" Click="ButtonClicked"/>
+            <Button x:Name="cancelButton" Content="Cancel" FontSize="13" Margin="0,10,0,0" Click="ButtonClicked"/>
         </StackPanel>
     </Grid>
 </Window>

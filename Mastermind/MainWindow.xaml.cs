@@ -585,7 +585,6 @@ namespace Mastermind
             RenewGame(startGame: false);
 
         }
-
         private void CalculateHighScores(string currentPlayer, int pogingen, int score, bool isVictory)
         {
             HighScore highScore = new HighScore { Name = currentPlayer, Pogingen = pogingen, Score = score, IsVictory = isVictory };
@@ -615,7 +614,6 @@ namespace Mastermind
 
             _highScores = newScores.ToArray();
         }
-
         private void GiveHint()
         {
             if (!_isRunning || _selectedColors == null || !_selectedColors.Any())
@@ -1127,7 +1125,6 @@ namespace Mastermind
             }
 
         }
-
         private void nextPlayerButton_Click(object sender, RoutedEventArgs e)
         {
             List<Player> finishedLst = _players
